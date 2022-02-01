@@ -24,9 +24,22 @@ class DetailsRecipesViewController: UIViewController{
         UIApplication.shared.open(recipeURL, options: [:], completionHandler: nil)
         
     }
+////    @IBAction func AddFavoriteButton(_ sender: Any) {
+//        guard let coreDataManager = coreDataManager else {return}
+//        guard let recipe = recipe else {return}
+//        if coreDataManager.isRecipeExist(name: recipe.label) {
+//            coreDataManager.deleteRecipe(name: recipe.label)
+//        }else {
+//            coreDataManager.createRecipe(recipe: recipe)
+////        }
+//    }
+    private var coreDataManager: CoreDataManager?
     override func viewDidLoad() {
         super.viewDidLoad()
         if let imageURL = recipe?.image, let url = URL(string: imageURL) {  RecipesImage.load(url: url) }
+        guard let appdelegate = UIApplication.shared.delegate as? AppDelegate else { return }
+        let coredataStack = appdelegate.coreDataStack
+        coreDataManager = CoreDataManager(coreDataStack: coredataStack)
         
         
         

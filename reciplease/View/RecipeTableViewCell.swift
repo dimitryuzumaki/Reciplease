@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import CoreData
 
 class RecipeTableViewCell: UITableViewCell {
     
@@ -17,7 +18,14 @@ class RecipeTableViewCell: UITableViewCell {
     @IBOutlet weak var nameOfRecipe: UILabel!
     
     @IBOutlet weak var calorieData: UILabel!
-      
+    
+    private var coreDataManager: CoreDataManager?
+    
+    var createRecipe:RecipeEntity{
+        didSet{
+            
+        }
+    }
     
     var recipe: Recipe?{
         didSet{
@@ -28,7 +36,8 @@ class RecipeTableViewCell: UITableViewCell {
             
             
         }
+        
     }
-    }
-    
+}
+
 
