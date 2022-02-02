@@ -19,11 +19,12 @@ class RecipeTableViewCell: UITableViewCell {
     
     @IBOutlet weak var calorieData: UILabel!
     
-    private var coreDataManager: CoreDataManager?
-    
-    var createRecipe:RecipeEntity{
+       var recipeEntity:RecipeEntity?{
         didSet{
-            
+            if let imageURL = recipe?.image, let url = URL(string: imageURL) {  recipeImage.load(url: url) }
+            nameOfRecipe.text = recipe?.label
+            calorieData.text = "\(recipe?.calories ?? 0)"
+            IngredientDetail.text = recipe?.ingredientLines.joined(separator: ", ")
         }
     }
     
