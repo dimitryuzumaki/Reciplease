@@ -12,9 +12,8 @@ class FavoriteController: UIViewController{
     
     @IBOutlet weak var FavoriteRecipes: UITableView!
     var recipeEntity: RecipeEntity?
-    
     private var coreDataManager: CoreDataManager?
-    
+
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -25,12 +24,15 @@ class FavoriteController: UIViewController{
         FavoriteRecipes.register(nib, forCellReuseIdentifier: "recipeCell")
     }
     
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        guard let detailVc = segue.destination as? DetailsRecipesViewController else {return}
-        // envoyer la variable recipe  pour afficher la vue
+     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+       guard let detailVc = segue.destination as? DetailsRecipesViewController else {return}
+         guard let recipeEntity = recipeEntity else {
+             return
+         }
+         
+
         
-        
-    }
+   }
     
 }
 extension FavoriteController: UITableViewDataSource,UITableViewDelegate {

@@ -16,7 +16,7 @@ class DetailsRecipesViewController: UIViewController{
     
     
     @IBAction func DirectionButton(_ sender: Any) {
-        guard let linkURL = recipe?.url,
+        guard let linkURL = recipeDetails?.url,
               let recipeURL = URL(string: linkURL),
               UIApplication.shared.canOpenURL(recipeURL)
         else {
@@ -26,52 +26,54 @@ class DetailsRecipesViewController: UIViewController{
         
     }
     
-private var coreDataManager: CoreDataManager?
-override func viewDidLoad() {
-    super.viewDidLoad()
-    if let imageURL = recipe?.image, let url = URL(string: imageURL) {  RecipesImage.load(url: url) }
-    guard let appdelegate = UIApplication.shared.delegate as? AppDelegate else { return }
-    let coredataStack = appdelegate.coreDataStack
-    coreDataManager = CoreDataManager(coreDataStack: coredataStack)
+    private var coreDataManager: CoreDataManager?
+    var recipeDetails: RecipeDetails?
     
-    
-    
-}
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        if let imageURL = recipeDetails?.image, let url = URL(string: imageURL) {  RecipesImage.load(url: url) }
+        guard let appdelegate = UIApplication.shared.delegate as? AppDelegate else { return }
+        let coredataStack = appdelegate.coreDataStack
+        coreDataManager = CoreDataManager(coreDataStack: coredataStack)
+        
+        
+        
+    }
     
     @IBOutlet weak var starButton: UIButton!
     @IBAction func favoriteButton(_ sender: Any) {
         
         guard let coreDataManager = coreDataManager else {return}
-        guard let recipe = recipe else {return}
-        if coreDataManager.isRecipeExist(name: recipe.label){
+        guard let recipe = recipeDetails else {return}
+        if coreDataManager.isRecipeExist(name: recipeDetails?.name ?? ""){
             starButton.setImage(UIImage(systemName: "star"), for: .normal)
-            coreDataManager.deleteRecipe(name: recipe.label)
+            coreDataManager.deleteRecipe(name: recipeDetails?.name ?? "")
         }else {
             coreDataManager.createRecipe(recipe: recipe)
             starButton.setImage(UIImage(systemName: "star.fill"), for: .normal)
-      }
+        }
         
         
     }
-    }
-    
-   
+}
 
-    
-    var recipe: Recipe?
+
+
+
+
 
 extension DetailsRecipesViewController: UITableViewDataSource,UITableViewDelegate {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "IngredientCell", for: indexPath)
-        cell.textLabel?.text = recipe?.ingredientLines [indexPath.row]
+        cell.textLabel?.text = recipeDetails?.ingredients [indexPath.row]
         return cell
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return recipe?.ingredientLines.count ?? 0
+        return recipeDetails?.ingredients.count ?? 0
     }
 }
-    
+
 
 
 

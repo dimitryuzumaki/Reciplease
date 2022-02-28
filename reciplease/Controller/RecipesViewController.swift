@@ -20,7 +20,11 @@ class RecipesViewController: UIViewController {
     }
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         guard let detailVc = segue.destination as? DetailsRecipesViewController else {return}
-        detailVc.recipe = recipe
+        guard let recipe = recipe else {
+            return
+        }
+
+        detailVc.recipeDetails = RecipeDetails(name: recipe.label, image:recipe.image  , calories: String(recipe.calories), totaltimes: String(recipe.totalTime ?? 0), url: recipe.url, ingredients: recipe.ingredientLines)
     }
 }
 extension RecipesViewController: UITableViewDataSource,UITableViewDelegate {
