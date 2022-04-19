@@ -31,12 +31,28 @@ class DetailsRecipesViewController: UIViewController{
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        if let imageURL = recipeDetails?.image, let url = URL(string: imageURL) {  RecipesImage.load(url: url) }
+        if let image = RecipesImage.fetchImage(from: recipeDetails?.image) {
+            RecipesImage.image = image
+        }
         guard let appdelegate = UIApplication.shared.delegate as? AppDelegate else { return }
         let coredataStack = appdelegate.coreDataStack
         coreDataManager = CoreDataManager(coreDataStack: coredataStack)
         
         
+        
+    }
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        guard let coreDataManager = coreDataManager else {
+            return
+        }
+
+        if coreDataManager.isRecipeExist(name: recipeDetails?.name ?? "") {
+            starButton.setImage(UIImage(systemName: "star.fill"), for: .normal)
+        }else {
+            starButton.setImage(UIImage(systemName: "star"), for: .normal)
+        }
+            
         
     }
     
@@ -48,9 +64,11 @@ class DetailsRecipesViewController: UIViewController{
         if coreDataManager.isRecipeExist(name: recipeDetails?.name ?? ""){
             starButton.setImage(UIImage(systemName: "star"), for: .normal)
             coreDataManager.deleteRecipe(name: recipeDetails?.name ?? "")
+            print ("delete")
         }else {
             coreDataManager.createRecipe(recipe: recipe)
             starButton.setImage(UIImage(systemName: "star.fill"), for: .normal)
+            print ("add")
         }
         
         

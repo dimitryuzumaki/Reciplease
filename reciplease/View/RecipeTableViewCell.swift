@@ -19,26 +19,32 @@ class RecipeTableViewCell: UITableViewCell {
     
     @IBOutlet weak var calorieData: UILabel!
     
-       var recipeEntity:RecipeEntity?{
-        didSet{
-            if let imageURL = recipe?.image, let url = URL(string: imageURL) {  recipeImage.load(url: url) }
-            nameOfRecipe.text = recipe?.label
-            calorieData.text = "\(recipe?.calories ?? 0)"
-            IngredientDetail.text = recipe?.ingredientLines.joined(separator: ", ")
+    func configure(with recipe: RecipeDetails) {
+        DispatchQueue.global(qos: .background).async {
+            if let image = self.recipeImage.fetchImage(from: recipe.image){
+                DispatchQueue.main.async {
+                    self.recipeImage.image = image
+                }
+            }
         }
+        nameOfRecipe.text = recipe.name
+        calorieData.text = recipe.calories + "Kcal"
+        IngredientDetail.text = recipe.ingredients.joined(separator: ", ")
+
     }
-    
-    var recipe: Recipe?{
-        didSet{
-            if let imageURL = recipe?.image, let url = URL(string: imageURL) {  recipeImage.load(url: url) }
-            nameOfRecipe.text = recipe?.label
-            calorieData.text = "\(recipe?.calories ?? 0)"
-            IngredientDetail.text = recipe?.ingredientLines.joined(separator: ", ")
-            
-            
+    func configure(with recipe: RecipeEntity){
+        DispatchQueue.global(qos: .background).async {
+            if let image = self.recipeImage.fetchImage(from: recipe.image){
+                DispatchQueue.main.async {
+                    self.recipeImage.image = image
+                }
+            }
         }
-        
+        nameOfRecipe.text = recipe.name
+        calorieData.text = recipe.calories
+        IngredientDetail.text = recipe.ingredients!.joined(separator: ", ")
     }
 }
+
 
 

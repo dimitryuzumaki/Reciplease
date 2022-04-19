@@ -10,10 +10,10 @@ import CoreData
 
 class FavoriteController: UIViewController{
     
-    @IBOutlet weak var FavoriteRecipes: UITableView!
+    @IBOutlet weak var favoriteRecipeTableview: UITableView!
     var recipeEntity: RecipeEntity?
     private var coreDataManager: CoreDataManager?
-
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -21,18 +21,22 @@ class FavoriteController: UIViewController{
         let coredataStack = appdelegate.coreDataStack
         coreDataManager = CoreDataManager(coreDataStack: coredataStack)
         let nib = UINib(nibName: "RecipeTableViewCell", bundle: nil)
-        FavoriteRecipes.register(nib, forCellReuseIdentifier: "recipeCell")
+        favoriteRecipeTableview.register(nib, forCellReuseIdentifier: "recipeCell")
+    }
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        favoriteRecipeTableview.reloadData()
     }
     
-     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-       guard let detailVc = segue.destination as? DetailsRecipesViewController else {return}
-         guard let recipeEntity = recipeEntity else {
-             return
-         }
-         
-
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        guard let detailVc = segue.destination as? DetailsRecipesViewController else {return}
+        guard let recipeEntity = recipeEntity else {
+            return
+        }
         
-   }
+        detailVc.recipeDetails = RecipeDetails(name: String (recipeEntity.name ?? ""), image: recipeEntity.image, calories: String (recipeEntity.calories ?? ""), totaltimes: String (recipeEntity.totalTime ?? "") , url: String (recipeEntity.url ?? ""), ingredients: [String] (recipeEntity.ingredients ?? [""]), nextLink: "")
+        
+    }
     
 }
 extension FavoriteController: UITableViewDataSource,UITableViewDelegate {
@@ -43,7 +47,9 @@ extension FavoriteController: UITableViewDataSource,UITableViewDelegate {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "recipeCell") as!
         RecipeTableViewCell
-        cell.recipeEntity = coreDataManager?.recipes[indexPath.row]
+        guard let coreDataManager = coreDataManager else{return UITableViewCell()}
+        let recipe = coreDataManager.recipes[indexPath.row]
+        cell.configure(with: recipe)
         return cell
     }
     
@@ -53,17 +59,15 @@ extension FavoriteController: UITableViewDataSource,UITableViewDelegate {
     }
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 190    }
-}
-extension UIImageView {
-    func loadImage(url: URL) {
-        DispatchQueue.global().async { [weak self] in
-            if let data = try? Data(contentsOf: url) {
-                if let image = UIImage(data: data) {
-                    DispatchQueue.main.async {
-                        self?.image = image
-                    }
-                }
-            }
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == .delete {
+            
+            coreDataManager?.deleteRecipe(name: coreDataManager?.recipes[indexPath.row].name ?? "")
+            tableView.deleteRows(at: [indexPath], with: .fade)
+            tableView.reloadData()
         }
+        
     }
 }
+
+

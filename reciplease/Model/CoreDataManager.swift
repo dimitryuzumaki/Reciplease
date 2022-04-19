@@ -28,11 +28,11 @@ final class CoreDataManager {
     
     // MARK: - Manage Task Entity
     
-    func createRecipe(recipe: Recipe) {
+    func createRecipe(recipe: RecipeDetails) {
         let recipesEntity = RecipeEntity  (context: managedObjectContext)
-        recipesEntity.name = recipe.label
-        recipesEntity.ingredients = recipe.ingredientLines
-        recipesEntity.calories = recipe.label
+        recipesEntity.name = recipe.name
+        recipesEntity.ingredients = recipe.ingredients
+        recipesEntity.calories = recipe.calories
         recipesEntity.url = recipe.url
         recipesEntity.image = recipe.image
         coreDataStack.saveContext()

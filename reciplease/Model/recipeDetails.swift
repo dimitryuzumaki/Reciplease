@@ -14,5 +14,5 @@ struct RecipeDetails {
     let totaltimes: String
     let url: String
     let ingredients: [String]
-    
+    let nextLink: String
 }

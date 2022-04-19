@@ -7,7 +7,7 @@
 
 import UIKit
 
-class ViewController: UIViewController {
+class SearchController: UIViewController {
     
     @IBOutlet weak var searchRecipeButton: UIButton!
     @IBOutlet weak var clearListButton: UIButton!
@@ -16,7 +16,7 @@ class ViewController: UIViewController {
     @IBOutlet weak var tableView: UITableView!
     private let ingredientManager = IngredientManager()
     private let service = EdamamService()
-    private var recipes = [Hit]()
+    private var recipes = [RecipeDetails]()
     override func viewDidLoad() {
         super.viewDidLoad()
         setDelegates()
@@ -32,7 +32,9 @@ class ViewController: UIViewController {
     private func setTargets() {
         addIngredientButton.addTarget(self, action: #selector(addIngredient), for: .touchUpInside)
         searchRecipeButton.addTarget(self, action: #selector(searchRecipe), for: .touchUpInside)
+        clearListButton.addTarget(self, action: #selector(clearButtonTap), for: .touchUpInside)
     }
+    
     
     @objc private func addIngredient() {
         if let ingredientText = ingredientTextField.text, !ingredientText.isEmpty {
@@ -42,13 +44,22 @@ class ViewController: UIViewController {
             }
         }
     }
+    @objc
+    private func dismissKeyboard() {
+        ingredientTextField.resignFirstResponder()
+    }
+    @objc private func clearButtonTap() {
+        ingredientManager.ingredientList.removeAll()
+        reloadTableView()
+        
+    }
     
     @objc private func searchRecipe() {
         service.getData(ingredients: ingredientManager.ingredientList) { [weak self] result in DispatchQueue.main.async {
             [self] in switch result {
-            case .success(let data) :
+            case .success(let recipes) :
                 self?.ingredientManager.ingredientList = [""]
-                self?.recipes = data.hits
+                self?.recipes = recipes
                 self?.performSegue(withIdentifier:"HomeToRecipes" , sender: nil)
             case .failure:
                 self?.showAlert(title: "Aucune données", message: "veuillez resaisir vos ingrédients")
@@ -58,6 +69,7 @@ class ViewController: UIViewController {
         }
         
     }
+    
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if let recipesController = segue.destination as? RecipesViewController {
             recipesController.recipes = recipes
@@ -69,9 +81,10 @@ class ViewController: UIViewController {
         }
     }
     
+    
 }
 
-extension ViewController: UITableViewDataSource {
+extension SearchController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return ingredientManager.ingredientList.count
     }
@@ -85,12 +98,12 @@ extension ViewController: UITableViewDataSource {
         return cell
     }
 }
-extension ViewController: UITableViewDelegate {
+extension SearchController: UITableViewDelegate {
     
     
 }
 
-extension ViewController: UITextFieldDelegate {
+extension SearchController: UITextFieldDelegate {
     
 }
 
